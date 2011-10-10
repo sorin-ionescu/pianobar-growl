@@ -54,6 +54,7 @@ NOTIFY_NETWORK_ERROR = True
 
 # Imports
 from gntp.notifier import GrowlNotifier
+import socket
 import os
 import sys
 
@@ -79,7 +80,11 @@ growl = GrowlNotifier(
         u'Network Error'])
 
 # Register Pianobar with Growl.
-growl.register()
+try:
+    growl.register()
+except socket.error:
+    # Be silent.
+    pass
 
 # Parse stdin into the dictionary.
 for line in sys.stdin:
@@ -103,79 +108,83 @@ else:
 if len(info[u'coverArt']) == 0:
     info[u'coverArt'] = info[u'programIcon']
 
-if argc < 1:
-    sys.exit(1)
-elif argv[1] == u'songstart' and NOTIFY_SONG_START:
-    growl.notify(
-        noteType=u'Song Start',
-        icon=info[u'coverArt'],
-        title=u'{0}{1}'.format(
-            info[u'title'],
-            info[u'lovedIcon']),
-        description=u'{0}\n{1}'.format(
-            info[u'artist'],
-            info[u'album']))
-elif argv[1] == u'songfinish' and NOTIFY_SONG_END:
-    growl.notify(
-        noteType=u'Song End',
-        icon=info[u'coverArt'],
-        title=u'{0}{1}'.format(
-            info[u'title'],
-            info[u'lovedIcon']),
-        description=u'{0}\n{1}'.format(
-            info[u'artist'],
-            info[u'album']))
-elif argv[1] == u'songlove' and NOTIFY_SONG_LOVE:
-    growl.notify(
-        noteType='Song Love',
-        icon=info[u'coverArt'],
-        title=u'Song Loved',
-        description=u'{0}\n{1}\n{2}'.format(
-            info[u'title'],
-            info[u'artist'],
-            info[u'album']))
-elif argv[1] == u'songban' and NOTIFY_SONG_BAN:
-    growl.notify(
-        noteType='Song Ban',
-        icon=info[u'coverArt'],
-        title=u'Song Banned',
-        description=u'{0}\n{1}\n{2}'.format(
-            info[u'title'],
-            info[u'artist'],
-            info[u'album']))
-elif argv[1] == u'songshelf' and NOTIFY_SONG_SHELVE:
-    growl.notify(
-        noteType='Song Shelve',
-        icon=info[u'coverArt'],
-        title=u'Song Shelved',
-        description=u'{0}\n{1}\n{2}'.format(
-            info[u'title'],
-            info[u'artist'],
-            info[u'album']))
-elif argv[1] == u'songbookmark' and NOTIFY_SONG_BOOKMARK:
-    growl.notify(
-        noteType='Song Bookmark',
-        icon=info[u'coverArt'],
-        title=u'Song Bookmarked',
-        description=u'{0}\n{1}\n{2}'.format(
-            info[u'title'],
-            info[u'artist'],
-            info[u'album']))
-elif argv[1] == u'artistbookmark' and NOTIFY_ARTIST_BOOKMARK:
-    growl.notify(
-        noteType='Artist Bookmark',
-        icon=info[u'coverArt'],
-        title=u'Artist Bookmarked',
-        description=info[u'artist'])
-elif info[u'pRet'] != 1 and NOTIFY_PROGRAM_ERROR:
-    growl.notify(
-        noteType=u'Program Error',
-        icon=info[u'programIcon'],
-        title=u'Pianobar Failed',
-        description=info[u'pRetStr'])
-elif info[u'wRet'] != 1 and NOTIFY_NETWORK_ERROR:
-    growl.notify(
-        noteType=u'Network Error',
-        icon=info[u'programIcon'],
-        title=u'Network Failed',
-        description=info[u'wRetStr'])
+try:
+    if argc < 1:
+        sys.exit(1)
+    elif argv[1] == u'songstart' and NOTIFY_SONG_START:
+        growl.notify(
+            noteType=u'Song Start',
+            icon=info[u'coverArt'],
+            title=u'{0}{1}'.format(
+                info[u'title'],
+                info[u'lovedIcon']),
+            description=u'{0}\n{1}'.format(
+                info[u'artist'],
+                info[u'album']))
+    elif argv[1] == u'songfinish' and NOTIFY_SONG_END:
+        growl.notify(
+            noteType=u'Song End',
+            icon=info[u'coverArt'],
+            title=u'{0}{1}'.format(
+                info[u'title'],
+                info[u'lovedIcon']),
+            description=u'{0}\n{1}'.format(
+                info[u'artist'],
+                info[u'album']))
+    elif argv[1] == u'songlove' and NOTIFY_SONG_LOVE:
+        growl.notify(
+            noteType='Song Love',
+            icon=info[u'coverArt'],
+            title=u'Song Loved',
+            description=u'{0}\n{1}\n{2}'.format(
+                info[u'title'],
+                info[u'artist'],
+                info[u'album']))
+    elif argv[1] == u'songban' and NOTIFY_SONG_BAN:
+        growl.notify(
+            noteType='Song Ban',
+            icon=info[u'coverArt'],
+            title=u'Song Banned',
+            description=u'{0}\n{1}\n{2}'.format(
+                info[u'title'],
+                info[u'artist'],
+                info[u'album']))
+    elif argv[1] == u'songshelf' and NOTIFY_SONG_SHELVE:
+        growl.notify(
+            noteType='Song Shelve',
+            icon=info[u'coverArt'],
+            title=u'Song Shelved',
+            description=u'{0}\n{1}\n{2}'.format(
+                info[u'title'],
+                info[u'artist'],
+                info[u'album']))
+    elif argv[1] == u'songbookmark' and NOTIFY_SONG_BOOKMARK:
+        growl.notify(
+            noteType='Song Bookmark',
+            icon=info[u'coverArt'],
+            title=u'Song Bookmarked',
+            description=u'{0}\n{1}\n{2}'.format(
+                info[u'title'],
+                info[u'artist'],
+                info[u'album']))
+    elif argv[1] == u'artistbookmark' and NOTIFY_ARTIST_BOOKMARK:
+        growl.notify(
+            noteType='Artist Bookmark',
+            icon=info[u'coverArt'],
+            title=u'Artist Bookmarked',
+            description=info[u'artist'])
+    elif info[u'pRet'] != 1 and NOTIFY_PROGRAM_ERROR:
+        growl.notify(
+            noteType=u'Program Error',
+            icon=info[u'programIcon'],
+            title=u'Pianobar Failed',
+            description=info[u'pRetStr'])
+    elif info[u'wRet'] != 1 and NOTIFY_NETWORK_ERROR:
+        growl.notify(
+            noteType=u'Network Error',
+            icon=info[u'programIcon'],
+            title=u'Network Failed',
+            description=info[u'wRetStr'])
+except socket.error:
+    # Be silent.
+    pass
